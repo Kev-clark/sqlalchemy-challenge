@@ -134,18 +134,19 @@ def startdate(start):
     
   return jsonify(df.to_json())
 @app.route("/api/v1.0/temprange/<start>/<end>")
-def temprange(start, end):
+def temprange(start=None, end=None):
   session=Session(engine)
   startdate=dt.strptime(start,'%Y-%m-%d' )
   startdate=dt.strftime(startdate, '%Y-%m-%d' )
-  enddate=""
-  if end =="":
-    for x in session.query(Measurement.date).order_by(Measurement.date.desc()).first():
-      enddate=x
-    end=enddate    
-
+  
+  if end == None:
+      end="2016-08-23"   
+  
   enddate=dt.strptime(end,'%Y-%m-%d' )
   enddate=dt.strftime(enddate, '%Y-%m-%d' )
+  if dt.strptime(start,'%Y-%m-%d' ) > dt.strptime(end,'%Y-%m-%d' ):
+    return jsonify("Not a valid search")
+  
   # Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
 
   # When given the start only, calculate `TMIN`, `TAVG`, and `TMAX` for all dates greater than and equal to the start date.
